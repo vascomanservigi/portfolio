@@ -3,110 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posts & Pubblicazioni | Alex Rossi</title>
+    <title>Blog - Tutti i post</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-
-    <header class="navbar-container">
-        <nav class="navbar">
-            <a href="index.html" class="logo">
-                <i class="ph ph-terminal-window"></i>
-                <span>Alex Rossi</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="ph ph-house"></i> Home</a></li>
-                <li><a href="portfolio.html"><i class="ph ph-user-list"></i> Portfolio</a></li>
-                <li><a href="posts.html" class="active"><i class="ph ph-article"></i> Posts</a></li>
+    <header>
+        <nav>
+            <a href="index.html" class="logo">Portfolio</a>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+                <li><a href="posts.html" class="active">Blog</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="container">
-        <!-- Header Page -->
-        <section class="hero-section">
-            <div class="page-icon">
-                <i class="ph ph-books"></i>
-            </div>
-            <h1>Posts & Pubblicazioni</h1>
-            <p class="subtitle">Raccolta di articoli, riflessioni, guide di studio e resoconti sui miei progetti.</p>
-        </section>
-
-        <hr class="notion-divider">
-
-        <!-- Database List View Style -->
-        <section class="section">
-            <div class="notion-table">
-                <div class="table-header">
-                    <span class="col-title"><i class="ph ph-text-columns"></i> Titolo</span>
-                    <span class="col-tag"><i class="ph ph-tag"></i> Categoria</span>
-                    <span class="col-date"><i class="ph ph-calendar-blank"></i> Data</span>
-                </div>
-
-                <div class="table-body">
-                    <!-- Post 1 -->
-                    <a href="post-1.html" class="table-row">
-                        <div class="col-title">
-                            <i class="ph ph-file-text row-icon"></i>
-                            <span class="row-text">La mia esperienza alla Hackathon Studentesca 2026</span>
-                        </div>
-                        <div class="col-tag">
-                            <span class="tag">Esperienza</span>
-                        </div>
-                        <div class="col-date">10 Maggio 2026</div>
-                    </a>
-
-                    <!-- Post 2 -->
-                    <a href="#" class="table-row">
-                        <div class="col-title">
-                            <i class="ph ph-file-text row-icon"></i>
-                            <span class="row-text">Guida pratica a Git e GitHub per studenti</span>
-                        </div>
-                        <div class="col-tag">
-                            <span class="tag">Tutorial</span>
-                        </div>
-                        <div class="col-date">28 Aprile 2026</div>
-                    </a>
-
-                    <!-- Post 3 -->
-                    <a href="#" class="table-row">
-                        <div class="col-title">
-                            <i class="ph ph-file-text row-icon"></i>
-                            <span class="row-text">Come organizzare lo studio delle materie STEM con Notion</span>
-                        </div>
-                        <div class="col-tag">
-                            <span class="tag">Metodo Studio</span>
-                        </div>
-                        <div class="col-date">15 Marzo 2026</div>
-                    </a>
-
-                    <!-- Post 4 -->
-                    <a href="#" class="table-row">
-                        <div class="col-title">
-                            <i class="ph ph-file-text row-icon"></i>
-                            <span class="row-text">Perché ho deciso di imparare JavaScript durante le superiori</span>
-                        </div>
-                        <div class="col-tag">
-                            <span class="tag">Riflessione</span>
-                        </div>
-                        <div class="col-date">02 Gennaio 2026</div>
-                    </a>
-                </div>
-            </div>
+    <main>
+        <section class="container">
+            <h2>Articoli e Aggiornamenti</h2>
+            <ul class="post-list" id="posts-container" style="padding: 0; list-style: none;">
+                <p style="color: #666;">Caricamento post in corso...</p>
+            </ul>
         </section>
     </main>
 
-    <footer class="footer">
-        <div class="container footer-content">
-            <p><i class="ph ph-copyright"></i> 2026 Alex Rossi. Costruito con estetica Notion.</p>
-            <div class="social-links">
-                <a href="https://github.com" target="_blank" title="GitHub"><i class="ph ph-github-logo"></i></a>
-                <a href="https://linkedin.com" target="_blank" title="LinkedIn"><i class="ph ph-linkedin-logo"></i></a>
-                <a href="mailto:email@esempio.com" title="Email"><i class="ph ph-envelope-simple"></i></a>
-            </div>
-        </div>
+    <footer>
+        <p>&copy; 2026 - Tutti i diritti riservati</p>
     </footer>
 
+    <script>
+        // CONFIGURAZIONE: Inserisci qui i dati del tuo repository GitHub
+        const username = "IL_TUO_USERNAME_GITHUB"; 
+        const repoName = "NOME_DEL_REPOSITORY";
+        const folderPath = "posts"; // Nome della cartella dei post
+
+        async function loadPosts() {
+            const container = document.getElementById('posts-container');
+            const apiUrl = `https://api.github.com/repos/${username}/${repoName}/contents/${folderPath}`;
+
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error("Impossibile recuperare i post");
+
+                const files = await response.json();
+                
+                // Filtra solo i file HTML (escludendo eventuali file indesiderati)
+                const htmlFiles = files.filter(file => file.name.endsWith('.html') && file.name !== 'index.html');
+
+                if (htmlFiles.length === 0) {
+                    container.innerHTML = "<p>Nessun post trovato.</p>";
+                    return;
+                }
+
+                // Ordina i file dal più recente al più vecchio (basandosi sul nome/numerazione)
+                htmlFiles.reverse();
+
+                let output = '';
+
+                // Cicla ogni file per leggerne il contenuto e prenderne il titolo reale
+                for (const file of htmlFiles) {
+                    let postTitle = file.name.replace('.html', '').replace(/-/g, ' '); // Fallback se la fetch fallisce
+
+                    try {
+                        const fileResponse = await fetch(file.download_url);
+                        const htmlText = await fileResponse.text();
+                        
+                        // Estrae il testo racchiuso tra <title> e </title> nel file del post
+                        const match = htmlText.match(/<title>(.*?)<\/title>/i);
+                        if (match && match[1]) {
+                            postTitle = match[1];
+                        }
+                    } catch (e) {
+                        console.error("Errore lettura titolo per " + file.name, e);
+                    }
+
+                    // Mantiene esattamente l'aspetto estetico e la struttura coerente col tuo stile CSS
+                    output += `
+                        <li style="margin-bottom: 2rem;">
+                            <h3 style="margin: 0.2rem 0;"><a href="${folderPath}/${file.name}" style="text-decoration: none; color: #111;">${postTitle}</a></h3>
+                            <p style="margin: 0; color: #555; font-size: 0.9rem;">Leggi l'articolo completo...</p>
+                        </li>
+                    `;
+                }
+
+                container.innerHTML = output;
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = "<p style='color: red;'>Errore nel caricamento dei post da GitHub.</p>";
+            }
+        }
+
+        loadPosts();
+    </script>
 </body>
 </html>
